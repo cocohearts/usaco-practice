@@ -1,14 +1,13 @@
-#include <bits/stdc++.h>
-// #include <vector>
-// #include <string>
-// #include <iostream>
+#include <iostream>
+#include <vector>
+#include <string>
 
 using namespace std;
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    // freopen("lights.in","r",stdin);
+    freopen("lights.in","r",stdin);
     int T, N;
     cin >> T >> N;
     int SIZE = (1 << N);
