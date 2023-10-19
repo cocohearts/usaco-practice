@@ -1,0 +1,6 @@
+input
+myoutput
+.dSYM
+.DS_Store
+*.in
+*.out
