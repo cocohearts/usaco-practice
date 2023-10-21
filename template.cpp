@@ -10,6 +10,7 @@ typedef vector<int>      vi;
 
 #define INF 1000000000
 #define loop(x,n) for(int x = 0; x < n; ++x)
+#define sloop(e,s) for(auto&& e : s)
 
 int main() {
     // freopen("input","r",stdin);
