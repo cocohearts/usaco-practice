@@ -4,7 +4,7 @@
 
 input
 myoutput
-.dSYM
+*.dSYM/
 .DS_Store
 *.in
 *.out
