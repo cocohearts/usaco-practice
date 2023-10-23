@@ -12,6 +12,10 @@ typedef vector<int>      vi;
 #define loop(x,n) for(int x = 0; x < n; ++x)
 #define sloop(e,s) for(auto&& e : s)
 #define itloop(it,m) for(auto&& it = m.begin(); it!=m.end(); ++it)
+#define F first
+#define S second
+#define PB push_back
+#define MP make_pair
 
 int main() {
     // freopen("input","r",stdin);
