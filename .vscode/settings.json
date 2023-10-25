@@ -4,6 +4,7 @@
         "set": "cpp",
         "__tree": "cpp",
         "map": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "iomanip": "cpp"
     }
 }
