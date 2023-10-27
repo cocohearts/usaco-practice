@@ -32,19 +32,26 @@ int main() {
         cin >> A >> B >> C;
         criteria = (int)sqrt(C);
         iloop(x,-1*criteria,criteria+1) {
-            if (B%x==0) {
-                criteria = (int)sqrt((C-x*x)/2);
-                iloop(y,-1*criteria,criteria+1) {
-                    if (B/x % y==0 && x!=y) {
-                        int z = A-x-y;
-                        if (x*y*z==B && x*x+y*y+z*z==C && x!=z && y!=z) {
-                            solved = true;
-                            cout << x << " " << y << " " << z << "\n";
-                            break;
+            if (x) {
+                if (B%x==0) {
+                    if (C>x*x) {
+                        criteria = (int)sqrt(C-x*x);
+                        iloop(y,-1*criteria,criteria+1) {
+                            if (y) {
+                                if (B/x % y==0 && x!=y) {
+                                    int z = A-x-y;
+                                    if (x*y*z==B && x*x+y*y+z*z==C && x!=z && y!=z) {
+                                        solved = true;
+                                        cout << x << " " << y << " " << z << "\n";
+                                        break;
+                                    }
+                                }
+                            }
                         }
+                        if (solved) break;
                     }
                 }
-                if (solved) break;
+
             }
         }
         if (!solved) cout << "No solution.\n";
