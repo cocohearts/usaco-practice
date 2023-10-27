@@ -10,6 +10,7 @@ typedef vector<int>      vi;
 
 #define INF 1000000000
 #define loop(x,n) for(int x = 0; x < n; ++x)
+#define iloop(x,a,n) for(int x=a; x<n; ++x)
 #define sloop(e,s) for(auto&& e : s)
 #define itloop(it,m) for(auto&& it = m.begin(); it!=m.end(); ++it)
 #define F first
