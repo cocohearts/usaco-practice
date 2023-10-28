@@ -23,10 +23,9 @@ vi scores;
 vi bestScores;
 vi curScores;
 vi curScoreIndex;
-bool solved;
 
 void iterate() {
-    if (bestScores.size() > curScores.size()) {
+    if (bestScores.size() > curScores.size() || bestScores.size()==0) {
         if (!target) {
             bestScores = curScores;
         } else {
@@ -47,7 +46,7 @@ void iterate() {
 }
 
 int main() {
-    // freopen("input","r",stdin);
+    freopen("input","r",stdin);
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
@@ -63,10 +62,10 @@ int main() {
             scores.PB(newScore);
         }
         sort(scores.begin(),scores.end(),greater<int>());
-        curScoreIndex.clear();
-        bestScores.resize(target);
+
+        bestScores.clear();
         iterate();
-        if (bestScores.size() < target) {
+        if (bestScores.size()) {
             cout << "[" << bestScores.size() << "] ";
             loop(i,bestScores.size()) {
                 cout << bestScores[i];
