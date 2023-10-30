@@ -5,6 +5,14 @@
         "__tree": "cpp",
         "map": "cpp",
         "iosfwd": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "queue": "cpp",
+        "valarray": "cpp",
+        "__bit_reference": "cpp",
+        "__hash_table": "cpp",
+        "string": "cpp",
+        "string_view": "cpp",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp"
     }
 }
