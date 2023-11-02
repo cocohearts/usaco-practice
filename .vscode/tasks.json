@@ -8,6 +8,12 @@
                 "-fdiagnostics-color=always",
                 "--std=c++11",
                 "-g",
+                "-Wall",
+                "-Wextra",
+                "-Wshadow",
+                "-D_GLIBCXX_ASSERTIONS", 
+                "-DDEBUG",
+                "-ggdb3",
                 "${file}",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"

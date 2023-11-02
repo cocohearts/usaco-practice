@@ -18,6 +18,7 @@ typedef vector<int>      vi;
 #define PB push_back
 #define MP make_pair
 
+int sols[1001][100][1001];
 
 int main() {
     ios::sync_with_stdio(false);
@@ -30,14 +31,12 @@ int main() {
     int level, levels[N];
     loop(i,N) {
         cin >> level;
-        ++level;
         levels[i] = level;
     }
-    int sols[1000][100][1000];
-    loop(base,1000) {
+    loop(base,1001) {
         loop(curIndex,N) {
             if (!curIndex) {
-                loop(val,1000) {
+                loop(val,1001) {
                     if (val!=base) {
                         sols[base][curIndex][val] = 0;
                     } else {
@@ -49,13 +48,24 @@ int main() {
                 for (int val = levels[curIndex-1]; val >= base; --val) {
                     prefSum += sols[base][curIndex-1][levels[curIndex-1]-val+base];
                     prefSum %= P;
-                    if (val < levels[curIndex]) {
+                    if (val <= levels[curIndex]) {
                         sols[base][curIndex][val] = prefSum;
                     }
                 }
             }
         }
     }
+
+    // loop(base,2) {
+    //     loop(curIndex,N) {
+    //         loop(val,5) {
+    //             cerr << sols[base][curIndex][val] << " ";
+    //         }
+    //         cerr << "\n";
+    //     }
+    //     cerr << "\n";
+    // }
+
     int answer = 0;
     loop(val,1000) {
         answer += sols[0][N-1][val];
