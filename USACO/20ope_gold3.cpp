@@ -18,65 +18,47 @@ typedef vector<int>      vi;
 #define PB push_back
 #define MP make_pair
 
-ll DP[10001][1231];
-
 int main() {
     // freopen("input","r",stdin);
     freopen("exercise.in","r",stdin);
     freopen("exercise.out","w",stdout);
+
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
-    ll N, M;
+    int N,M;
     cin >> N >> M;
-    bool primes[N+1];
+    vector<ll> DP(N+1,0);
+    DP[0] = 1;
+
+    vector<bool> primes(N+1,true);
+    primes[0] = primes[1] = false;
     loop(i,N+1) {
-        primes[i] = true;
-    }
-    primes[0] = false;
-    primes[1] = primes[2] = true;
-    iloop(p,2,N) {
-        if (primes[p]) {
-            int comp = 2*p;
+        if (primes[i]) {
+            int comp = 2*i;
             while (comp <= N) {
                 primes[comp] = false;
-                comp += p;
+                comp += i;
             }
         }
     }
-    vi primesArr;
-    loop(i,N+1) {
-        if (primes[i]) {
-            primesArr.PB(i);
+    loop(prime,N+1) {
+        if (primes[prime]) {
+            for (int ind = N; ind>0; --ind) {
+                ll pow = prime;
+                while (pow <= ind) {
+                    DP[ind] += pow * DP[ind-pow];
+                    DP[ind] %= M;
+                    pow *= prime;
+                    pow %= M;
+                }
+            }
         }
     }
-
-    loop(i,N) {
-        DP[0][i] = 1;
+    int answer = 0;
+    loop(ind,N+1) {
+        answer += DP[ind];
+        answer %= M;
     }
-    int prevPrime[N+1];
-    int primeIndex=-1;
-    iloop(i,0,N+1) {
-        if (primes[i]) {
-            ++primeIndex;
-        }
-        prevPrime[i] = primeIndex;
-    }
-    prevPrime[0] = INT_MAX;
-
-    iloop(n,1,N+1) {
-        DP[n][0] = 1;
-        iloop(i,1,primesArr.size()) {
-            int m = primesArr[i];
-            if (m>n) break;
-            ll newVal = DP[n][i-1];
-            int newIndex = i;
-            if (n>m) newIndex = min(newIndex,prevPrime[n-m]);
-            newVal += DP[n-m][newIndex]*m;
-            newVal %= M;
-            DP[n][i] = newVal;
-            // cerr << n << " " << i << " " << newVal << "\n";
-        }
-    }
-    cout << DP[N][primesArr.size()-1];
+    cout << answer;
 }
