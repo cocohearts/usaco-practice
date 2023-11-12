@@ -9,6 +9,7 @@ typedef vector<ii>      vii;
 typedef vector<int>      vi;
 
 #define INF 2000000000
+#define MOD 1e9+7
 #define loop(x,n) for(int x = 0; x < n; ++x)
 #define iloop(x,a,n) for(int x=a; x<n; ++x)
 #define sloop(e,s) for(auto&& e : s)
