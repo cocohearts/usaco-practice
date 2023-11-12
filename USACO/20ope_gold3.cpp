@@ -55,7 +55,7 @@ int main() {
             }
         }
     }
-    int answer = 0;
+    ll answer = 0;
     loop(ind,N+1) {
         answer += DP[ind];
         answer %= M;
