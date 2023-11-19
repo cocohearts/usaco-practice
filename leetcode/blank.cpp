@@ -9,6 +9,7 @@ typedef vector<ii>      vii;
 typedef vector<int>      vi;
 
 #define INF 1000000000
+#define MOD 1000000007
 #define loop(x,n) for(int x = 0; x < n; ++x)
 #define iloop(x,a,n) for(int x=a; x<n; ++x)
 #define sloop(e,s) for(auto&& e : s)
@@ -18,49 +19,71 @@ typedef vector<int>      vi;
 #define PB push_back
 #define MP make_pair
 
-bool check(vector<string> times) {
-    int len = times.size();
-    for (int i=0; i<len-2; i++) {
-        string time1 = times[i];
-        string time2 = times[i+2];
-        if (time1[1]==time2[1]) {
-            return true;
+class Solution {
+public:
+    vector<int> leftmostBuildingQueries(vector<int>& heights, vector<vector<int>>& queries) {
+        int n = heights.size();
+        int logn=0;
+        while (n>1<<logn) {
+            ++logn;
         }
-        if ((time2[1]-time1[1])==1) {
-            int min1 = stoi(time1.substr(2,2));
-            int min2 = stoi(time2.substr(2,2));
-            if (min2 < min1) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
+        n = heights.size();
+        int arr[n][logn+1];
 
-int main() {
-    // freopen("input","r",stdin);
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-    vector<vector<string>> access_times = {{"a","0549"},{"b","0457"},{"a","0532"},{"a","0621"},{"b","0540"}};
-    // {{"d","0002"},{"c","0808"},{"c","0829"},{"e","0215"},{"d","1508"},{"d","1444"},{"d","1410"},{"c","0809"}}{{"cd","1025"},{"ab","1025"},{"cd","1046"},{"cd","1055"},{"ab","1124"},{"ab","1120"}};
-    vector<string> answer;
-    vector<string> seen;
-    for (int i=0; i<access_times.size(); ++i) {
-        string employee = access_times[i][0];
-        if (find(seen.begin(),seen.end(),employee) == seen.end()) {
-            seen.push_back(employee);
-            vector<string> times;
-            for (int j=0; j<access_times.size(); ++j) {
-                if (access_times[j][0]==employee) {
-                    times.push_back(access_times[j][1]);
+        loop(exp,logn+1) {
+            loop(ind,n) {
+                if (!exp) {
+                    arr[ind][exp] = heights[ind];
+                    continue;
+                }
+                arr[ind][exp] = arr[ind][exp-1];
+                if (ind+(1<<(exp-1))<n) {
+                    arr[ind][exp] = max(arr[ind][exp],arr[ind+(1<<(exp-1))][exp-1]);
                 }
             }
-            sort(times.begin(),times.end());
-            if (check(times)) {
-                answer.push_back(employee);
-            }
         }
+        // loop(i,n) {
+        //     loop(j,logn+1) {
+        //         cerr << arr[i][j] << " ";
+        //     }
+        //     cerr << "\n";
+        // }
+        vi ans(queries.size());
+        int A,B,val;
+        loop(ind,queries.size()) {
+            A = min(queries[ind][0],queries[ind][1]); 
+            B = max(queries[ind][0],queries[ind][1]); 
+            if (heights[B]>=heights[A]) {
+                ans[ind] = B;
+                continue;
+            }
+
+            val = heights[A];
+            // find first index after B whose value is at least val
+            int search = B; 
+            int exp = logn;
+            if (arr[B][exp]<val) {
+                ans[ind] = -1; continue;
+            }
+            while (exp > 0) {
+                if (arr[search][exp-1]<val) {
+                    search += 1<<(exp-1);
+                }
+                --exp;
+            }
+            ans[ind] = search;
+        }
+        return ans;
     }
-    // cout << answer;
-    return answer;
-}
+};
+
+// int main() {
+//     Solution myObj;
+//     vi heights {6,4,8,5,2,7};
+//     vector<vi> queries {{0,1},{0,3},{2,4},{3,4},{2,2}};
+//     vi ans = myObj.leftmostBuildingQueries(heights,queries);
+//     sloop(item,ans) {
+//         cout << item << " ";
+//     }
+//     cout << "\n";
+// }
