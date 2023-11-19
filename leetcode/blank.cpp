@@ -77,13 +77,13 @@ public:
     }
 };
 
-// int main() {
-//     Solution myObj;
-//     vi heights {6,4,8,5,2,7};
-//     vector<vi> queries {{0,1},{0,3},{2,4},{3,4},{2,2}};
-//     vi ans = myObj.leftmostBuildingQueries(heights,queries);
-//     sloop(item,ans) {
-//         cout << item << " ";
-//     }
-//     cout << "\n";
-// }
+int main() {
+    Solution myObj;
+    vi heights {6,4,8,5,2,7};
+    vector<vi> queries {{0,1},{0,3},{2,4},{3,4},{2,2}};
+    vi ans = myObj.leftmostBuildingQueries(heights,queries);
+    sloop(item,ans) {
+        cout << item << " ";
+    }
+    cout << "\n";
+}

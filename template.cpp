@@ -8,7 +8,7 @@ typedef pair<int, int>   ii;
 typedef vector<ii>      vii;
 typedef vector<int>      vi;
 
-#define INF 2000000000
+#define INF 1000000000
 #define MOD 1000000007
 #define loop(x,n) for(int x = 0; x < n; ++x)
 #define iloop(x,a,n) for(int x=a; x<n; ++x)
