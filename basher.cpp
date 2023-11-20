@@ -19,24 +19,42 @@ typedef vector<int>      vi;
 #define PB push_back
 #define MP make_pair
 
+int x,y,d,m;
+
+int solve(int x) {
+    int ans=0;
+    loop(i,x) {
+        cout << ans << "\n";
+        if (i%m) continue;
+        string s = to_string(i);
+        bool broke = false;
+        loop(ind,s.size()) {
+            if ((ind%2) != (int)(s[ind]==d+'0')) {
+                broke = true;
+                break;
+            }
+        }
+        if (!broke) {
+            ++ans;
+            // cout << i << "\n";
+        } 
+    }
+    return ans;
+}
+
 int main() {
-    freopen("input","r",stdin);
+    freopen("CF/input","r",stdin);
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
-    int n;
-    cin >> n;
-    loop(i,n) {
-        int a, b;
-        cin >> a >> b;
-
-        int ans = 0;
-
-        for (int i = a; i <= b; i++) {
-        string s = to_string(i);
-        for (auto& c : s) ans += c - '0';
-        }
-
-        cout << ans << "\n";
-    }
+    cin >> m >> d >> x >> y;
+    // int ans = solve(y)-solve(x-1);
+    // cout << ans << "\n";
+    // int pow=1;
+    // loop(i,6) {
+    //     cout << pow << "\n";
+    //     cout << solve(pow) << "\n";
+    //     pow *= 10;
+    // }
+    solve(1000000);
 }
