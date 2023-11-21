@@ -19,99 +19,158 @@ typedef vector<int>      vi;
 #define PB push_back
 #define MP make_pair
 
-int DP[6][6+1][18][18][2];
-int nums[6];
-int Aanses[6][6];
-int Banses[6][6];
+// change L to 300
+const int L = 300;
+int DP[L][L+1][18][19][3];
+int nums[L];
 
-void fill(int N,int X,int anses[][6]) {
-    int digs[18];
-    int K = X;
-    loop(i,18) {
-        digs[17-i] = K%10;
-        K /= 10;
+void fill(int anses[][L], int N, ll X) {
+    ll pow = 1L;
+    ll Y = X;
+    int Xarr[18];
+    loop(ind,18) {
+        Xarr[ind] = Y%10;
+        Y /= 10L;
     }
-    loop(s_si,18) {
-        loop(s_st,18-s_si) {
-            loop(i_si,N) {
-                loop(i_st,N+1-i_si) {
-                    int i_en = i_st+i_si;
-                    int s_en = s_st+s_si;
-                    if (!s_si) {
-                        DP[i_st][i_en][s_st][s_si][0] = 1;
-                        DP[i_st][i_en][s_st][s_si][1] = 0;
-                    } else if (!i_si) {
-                        DP[i_st][i_en][s_st][s_si][0] = 0;
-                        DP[i_st][i_en][s_st][s_si][1] = 1;
-                    } else {
-                        DP[i_st][i_en][s_st][s_si][0] = 0;
-                        DP[i_st][i_en][s_st][s_si][1] = 0;
-                        
-                        int first = digs[s_st];
-                        int last = digs[s_en-1];
-                        DP[i_st][i_en][s_st][s_si][1] += DP[i_st][i_en-1][s_st+1][s_si-1][1];
-                        // DP[i_st][i_en][s_st][s_si][1] %= MOD;
-                        if (nums[i_en-1]<first) {
-                            DP[i_st][i_en][s_st][s_si][1] += DP[i_st][i_en-1][s_st+1][s_si-1][0];
-                            // DP[i_st][i_en][s_st][s_si][1] %= MOD;
-                        } else if (nums[i_en-1] == first) {
-                            DP[i_st][i_en][s_st][s_si][0] += DP[i_st][i_en-1][s_st+1][s_si-1][0];
-                            // DP[i_st][i_en][s_st][s_si][0] %= MOD;
-                        } 
+    // interval size is sSi
+    loop(sSi,19) {
+        // interval size is iSi+1
+        loop(iSi,N) {
+            loop(sSt,19-sSi) {
+                loop(iSt,N-iSi) {
+                    int sEn = sSt+sSi;
+                    int iEn = iSt+iSi;
 
-                        DP[i_st][i_en][s_st][s_si][1] += DP[i_st+1][i_en][s_st][s_si-1][1];
-                        // DP[i_st][i_en][s_st][s_si][1] %= MOD;
+                    if (!sSi) {
+                        // substring is empty; only choice is to drop all digits
+                        DP[iSt][iEn][sSt][sEn][0] = 0;
+                        DP[iSt][iEn][sSt][sEn][1] = 1;
+                        DP[iSt][iEn][sSt][sEn][2] = 0;
+                        continue;
+                    }
 
-                        if (nums[i_en-1]<=last) {
-                            DP[i_st][i_en][s_st][s_si][1] += DP[i_st][i_en-1][s_st][s_si-1][0];
-                            if (nums[i_en-1]==last) {
-                                // DP[i_st][i_en][s_st][s_si][0] %= MOD;
+                    int Xfd = Xarr[sSt];
+                    int Xld = Xarr[sEn-1];
+                    int dig = nums[iEn];
+
+                    if (!iSi) {
+                        // only have one digit; must place
+                        DP[iSt][iEn][sSt][sEn][0] = 0;
+                        DP[iSt][iEn][sSt][sEn][1] = 0;
+                        DP[iSt][iEn][sSt][sEn][2] = 0;
+                        if (sSi==1) {
+                            int ind;
+                            if (dig < Xld) {
+                                ind = 0;
+                            } else if (dig == Xld) {
+                                ind = 1;
                             } else {
-                                // DP[i_st][i_en][s_st][s_si][1] %= MOD;
+                                ind = 2;
                             }
-                        } 
+                            DP[iSt][iEn][sSt][sEn][ind] += 2;
+                        }
+                        continue;
+                    }
 
-                        DP[i_st][i_en][s_st][s_si][1] += DP[i_st][i_en-1][s_st][s_si][1];
-                        // DP[i_st][i_en][s_st][s_si][1] %= MOD;
-                        DP[i_st][i_en][s_st][s_si][0] += DP[i_st][i_en-1][s_st][s_si][0];
-                        // DP[i_st][i_en][s_st][s_si][0] %= MOD;
+                    // ignore new digit
+                    DP[iSt][iEn][sSt][sEn][0] = DP[iSt][iEn-1][sSt][sEn][0];
+                    DP[iSt][iEn][sSt][sEn][1] = DP[iSt][iEn-1][sSt][sEn][1];
+                    DP[iSt][iEn][sSt][sEn][2] = DP[iSt][iEn-1][sSt][sEn][2];
+
+                    // add new digit to end
+                    DP[iSt][iEn][sSt][sEn][0] += DP[iSt][iEn-1][sSt+1][sEn][0];
+                    DP[iSt][iEn][sSt][sEn][0] %= MOD;
+                    DP[iSt][iEn][sSt][sEn][2] += DP[iSt][iEn-1][sSt+1][sEn][2];
+                    DP[iSt][iEn][sSt][sEn][2] %= MOD;
+                    if (dig < Xfd) {
+                        DP[iSt][iEn][sSt][sEn][0] += DP[iSt][iEn-1][sSt+1][sEn][1];
+                        DP[iSt][iEn][sSt][sEn][0] %= MOD;
+                    } else {
+                        if (dig == Xfd) {
+                            DP[iSt][iEn][sSt][sEn][1] += DP[iSt][iEn-1][sSt+1][sEn][1];
+                            DP[iSt][iEn][sSt][sEn][1] %= MOD;
+                        } else {
+                            DP[iSt][iEn][sSt][sEn][2] += DP[iSt][iEn-1][sSt+1][sEn][1];
+                            DP[iSt][iEn][sSt][sEn][2] %= MOD;
+                        }
+                    }
+
+                    // add new digit to front
+                    if (dig <= Xld) {
+                        DP[iSt][iEn][sSt][sEn][0] += DP[iSt][iEn-1][sSt][sEn-1][0];
+                        DP[iSt][iEn][sSt][sEn][0] %= MOD;
+                        if (dig == Xld) {
+                            DP[iSt][iEn][sSt][sEn][1] += DP[iSt][iEn-1][sSt][sEn-1][1];
+                            DP[iSt][iEn][sSt][sEn][1] %= MOD;
+                            DP[iSt][iEn][sSt][sEn][2] += DP[iSt][iEn-1][sSt][sEn-1][2];
+                            DP[iSt][iEn][sSt][sEn][2] %= MOD;
+                        } else {
+                            DP[iSt][iEn][sSt][sEn][0] += DP[iSt][iEn-1][sSt][sEn-1][1];
+                            DP[iSt][iEn][sSt][sEn][0] %= MOD;
+                            DP[iSt][iEn][sSt][sEn][0] += DP[iSt][iEn-1][sSt][sEn-1][2];
+                            DP[iSt][iEn][sSt][sEn][0] %= MOD;
+                        }
+                    } else {
+                        DP[iSt][iEn][sSt][sEn][2] += DP[iSt][iEn-1][sSt][sEn-1][0];
+                        DP[iSt][iEn][sSt][sEn][2] %= MOD;
+                        DP[iSt][iEn][sSt][sEn][2] += DP[iSt][iEn-1][sSt][sEn-1][1];
+                        DP[iSt][iEn][sSt][sEn][2] %= MOD;
+                        DP[iSt][iEn][sSt][sEn][2] += DP[iSt][iEn-1][sSt][sEn-1][2];
+                        DP[iSt][iEn][sSt][sEn][2] %= MOD;
                     }
                 }
             }
         }
     }
-    loop(i,N) {
-        loop(j,N+1) {
-            // int ans = 0;
-            // loop(end,18) {
-
-            // }
-            cerr << i << " " << j << "\n";
-            cerr << DP[i][j][16][18][0] << " " << DP[i][j][16][18][1] << "\n";
-            anses[i][j] = DP[i][j][16][18][0]+DP[i][j][16][18][1] % MOD;
-            cerr << anses[i][j] << "\n\n";
+    int dig_len = 0; pow = 1;
+    while (pow<=X) {
+        ++dig_len; pow*=10;
+    }
+    loop(iSt,N) {
+        loop(iEn,N) {
+            int ans = 0;
+            loop(sEn,19) {
+                ans += DP[iSt][iEn][0][sEn][0];
+                ans += DP[iSt][iEn][0][sEn][1];
+                if (sEn<dig_len) {
+                    ans += DP[iSt][iEn][0][sEn][2];
+                }
+            }
+            anses[iSt][iEn] = ans;
         }
     }
 }
 
 
 int main() {
-    freopen("input","r",stdin);
+    // freopen("input","r",stdin);
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
-    int N,A,B;
+    int N;
+    ll A,B;
     cin >> N >> A >> B;
     loop(i,N) {
         cin >> nums[i];
     }
-    fill(N,A-1,Aanses);
-    fill(N,B,Banses);
+
+    int Aanses[L][L];
+    int Banses[L][L];
+    loop(i,L) loop(j,L) {
+        Aanses[i][j] = Banses[i][j] = 0;
+    }
+
+    fill(Aanses,N,A-1);
+    fill(Banses,N,B);
     int Q;
     cin >> Q;
     int m,n;
     loop(i,Q) {
         cin >> m >> n;
-        cout << Banses[m-1][n]-Aanses[m-1][n] << "\n";
+        --m; --n;
+        int ans = Banses[m][n]-Aanses[m][n];
+        ans %= MOD;
+        if (ans<0) ans += MOD;
+        cout << ans << "\n";
     }
 }
