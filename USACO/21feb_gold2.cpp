@@ -34,9 +34,6 @@ int main() {
     }
     loop(si,N) {
         loop(st,N-si) {
-            if (st==2 && si == 4) {
-                int k = 4;
-            }
             int en = st+si;
             if (!si) {
                 DP[st][en] = 1;
