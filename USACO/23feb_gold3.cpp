@@ -21,7 +21,8 @@ typedef vector<int>      vi;
 
 // change L to 300
 const int L = 300;
-int DP[L][L+1][18][19][3];
+int PR[L][L+1][18][3];
+int NX[L][L+1][18][3];
 int nums[L];
 
 void fill(int anses[][L], int N, ll X) {
@@ -32,6 +33,14 @@ void fill(int anses[][L], int N, ll X) {
         Xarr[ind] = Y%10;
         Y /= 10L;
     }
+    loop(iSt,N) loop(iEn,N) {
+        anses[iSt][iEn] = 0;
+    }
+    int dig_len = 0; pow = 1;
+    while (pow<=X) {
+        ++dig_len; pow*=10;
+    }
+
     // interval size is sSi
     loop(sSi,19) {
         // interval size is iSi+1
@@ -43,9 +52,9 @@ void fill(int anses[][L], int N, ll X) {
 
                     if (!sSi) {
                         // substring is empty; only choice is to drop all digits
-                        DP[iSt][iEn][sSt][sEn][0] = 0;
-                        DP[iSt][iEn][sSt][sEn][1] = 1;
-                        DP[iSt][iEn][sSt][sEn][2] = 0;
+                        NX[iSt][iEn][sSt][0] = 0;
+                        NX[iSt][iEn][sSt][1] = 1;
+                        NX[iSt][iEn][sSt][2] = 0;
                         continue;
                     }
 
@@ -55,9 +64,9 @@ void fill(int anses[][L], int N, ll X) {
 
                     if (!iSi) {
                         // only have one digit; must place
-                        DP[iSt][iEn][sSt][sEn][0] = 0;
-                        DP[iSt][iEn][sSt][sEn][1] = 0;
-                        DP[iSt][iEn][sSt][sEn][2] = 0;
+                        NX[iSt][iEn][sSt][0] = 0;
+                        NX[iSt][iEn][sSt][1] = 0;
+                        NX[iSt][iEn][sSt][2] = 0;
                         if (sSi==1) {
                             int ind;
                             if (dig < Xld) {
@@ -67,76 +76,82 @@ void fill(int anses[][L], int N, ll X) {
                             } else {
                                 ind = 2;
                             }
-                            DP[iSt][iEn][sSt][sEn][ind] += 2;
+                            NX[iSt][iEn][sSt][ind] += 2;
                         }
                         continue;
                     }
 
                     // ignore new digit
-                    DP[iSt][iEn][sSt][sEn][0] = DP[iSt][iEn-1][sSt][sEn][0];
-                    DP[iSt][iEn][sSt][sEn][1] = DP[iSt][iEn-1][sSt][sEn][1];
-                    DP[iSt][iEn][sSt][sEn][2] = DP[iSt][iEn-1][sSt][sEn][2];
+                    NX[iSt][iEn][sSt][0] = NX[iSt][iEn-1][sSt][0];
+                    NX[iSt][iEn][sSt][1] = NX[iSt][iEn-1][sSt][1];
+                    NX[iSt][iEn][sSt][2] = NX[iSt][iEn-1][sSt][2];
 
                     // add new digit to end
-                    DP[iSt][iEn][sSt][sEn][0] += DP[iSt][iEn-1][sSt+1][sEn][0];
-                    DP[iSt][iEn][sSt][sEn][0] %= MOD;
-                    DP[iSt][iEn][sSt][sEn][2] += DP[iSt][iEn-1][sSt+1][sEn][2];
-                    DP[iSt][iEn][sSt][sEn][2] %= MOD;
+                    NX[iSt][iEn][sSt][0] += PR[iSt][iEn-1][sSt+1][0];
+                    NX[iSt][iEn][sSt][0] %= MOD;
+                    NX[iSt][iEn][sSt][2] += PR[iSt][iEn-1][sSt+1][2];
+                    NX[iSt][iEn][sSt][2] %= MOD;
                     if (dig < Xfd) {
-                        DP[iSt][iEn][sSt][sEn][0] += DP[iSt][iEn-1][sSt+1][sEn][1];
-                        DP[iSt][iEn][sSt][sEn][0] %= MOD;
+                        NX[iSt][iEn][sSt][0] += PR[iSt][iEn-1][sSt+1][1];
+                        NX[iSt][iEn][sSt][0] %= MOD;
                     } else {
                         if (dig == Xfd) {
-                            DP[iSt][iEn][sSt][sEn][1] += DP[iSt][iEn-1][sSt+1][sEn][1];
-                            DP[iSt][iEn][sSt][sEn][1] %= MOD;
+                            NX[iSt][iEn][sSt][1] += PR[iSt][iEn-1][sSt+1][1];
+                            NX[iSt][iEn][sSt][1] %= MOD;
                         } else {
-                            DP[iSt][iEn][sSt][sEn][2] += DP[iSt][iEn-1][sSt+1][sEn][1];
-                            DP[iSt][iEn][sSt][sEn][2] %= MOD;
+                            NX[iSt][iEn][sSt][2] += PR[iSt][iEn-1][sSt+1][1];
+                            NX[iSt][iEn][sSt][2] %= MOD;
                         }
                     }
 
                     // add new digit to front
                     if (dig <= Xld) {
-                        DP[iSt][iEn][sSt][sEn][0] += DP[iSt][iEn-1][sSt][sEn-1][0];
-                        DP[iSt][iEn][sSt][sEn][0] %= MOD;
+                        NX[iSt][iEn][sSt][0] += PR[iSt][iEn-1][sSt][0];
+                        NX[iSt][iEn][sSt][0] %= MOD;
                         if (dig == Xld) {
-                            DP[iSt][iEn][sSt][sEn][1] += DP[iSt][iEn-1][sSt][sEn-1][1];
-                            DP[iSt][iEn][sSt][sEn][1] %= MOD;
-                            DP[iSt][iEn][sSt][sEn][2] += DP[iSt][iEn-1][sSt][sEn-1][2];
-                            DP[iSt][iEn][sSt][sEn][2] %= MOD;
+                            NX[iSt][iEn][sSt][1] += PR[iSt][iEn-1][sSt][1];
+                            NX[iSt][iEn][sSt][1] %= MOD;
+                            NX[iSt][iEn][sSt][2] += PR[iSt][iEn-1][sSt][2];
+                            NX[iSt][iEn][sSt][2] %= MOD;
                         } else {
-                            DP[iSt][iEn][sSt][sEn][0] += DP[iSt][iEn-1][sSt][sEn-1][1];
-                            DP[iSt][iEn][sSt][sEn][0] %= MOD;
-                            DP[iSt][iEn][sSt][sEn][0] += DP[iSt][iEn-1][sSt][sEn-1][2];
-                            DP[iSt][iEn][sSt][sEn][0] %= MOD;
+                            NX[iSt][iEn][sSt][0] += PR[iSt][iEn-1][sSt][1];
+                            NX[iSt][iEn][sSt][0] %= MOD;
+                            NX[iSt][iEn][sSt][0] += PR[iSt][iEn-1][sSt][2];
+                            NX[iSt][iEn][sSt][0] %= MOD;
                         }
                     } else {
-                        DP[iSt][iEn][sSt][sEn][2] += DP[iSt][iEn-1][sSt][sEn-1][0];
-                        DP[iSt][iEn][sSt][sEn][2] %= MOD;
-                        DP[iSt][iEn][sSt][sEn][2] += DP[iSt][iEn-1][sSt][sEn-1][1];
-                        DP[iSt][iEn][sSt][sEn][2] %= MOD;
-                        DP[iSt][iEn][sSt][sEn][2] += DP[iSt][iEn-1][sSt][sEn-1][2];
-                        DP[iSt][iEn][sSt][sEn][2] %= MOD;
+                        NX[iSt][iEn][sSt][2] += PR[iSt][iEn-1][sSt][0];
+                        NX[iSt][iEn][sSt][2] %= MOD;
+                        NX[iSt][iEn][sSt][2] += PR[iSt][iEn-1][sSt][1];
+                        NX[iSt][iEn][sSt][2] %= MOD;
+                        NX[iSt][iEn][sSt][2] += PR[iSt][iEn-1][sSt][2];
+                        NX[iSt][iEn][sSt][2] %= MOD;
                     }
                 }
             }
         }
-    }
-    int dig_len = 0; pow = 1;
-    while (pow<=X) {
-        ++dig_len; pow*=10;
-    }
-    loop(iSt,N) {
-        loop(iEn,N) {
-            int ans = 0;
-            loop(sEn,19) {
-                ans += DP[iSt][iEn][0][sEn][0];
-                ans += DP[iSt][iEn][0][sEn][1];
-                if (sEn<dig_len) {
-                    ans += DP[iSt][iEn][0][sEn][2];
+        loop(iSt,N) {
+            loop(iEn,N) {
+                int ans = 0;
+                ans += NX[iSt][iEn][0][0];
+                ans += NX[iSt][iEn][0][1];
+                ans %= MOD;
+                if (sSi<dig_len) {
+                    ans += NX[iSt][iEn][0][2];
+                    ans %= MOD;
+                }
+                anses[iSt][iEn] += ans;
+                anses[iSt][iEn] %= MOD;
+            }
+        }
+        loop(iSt,N) {
+            loop(iEn,N) {
+                loop(sSt,19) {
+                    loop(gt,3) {
+                        PR[iSt][iEn][sSt][gt] = NX[iSt][iEn][sSt][gt];
+                    }
                 }
             }
-            anses[iSt][iEn] = ans;
         }
     }
 }
