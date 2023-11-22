@@ -20,10 +20,10 @@ typedef vector<int>      vi;
 #define MP make_pair
 
 ll DP[5000][5000];
-int PF[5000][5000];
 int nums[5000];
 // int sorted[50];
-int indices[2000001];
+short int freq[2000001];
+const int M = 1000000;
 
 int main() {
     // freopen("input","r",stdin);
@@ -35,23 +35,28 @@ int main() {
     int N,Q;
     cin >> N >> Q;
     loop(i,2000001) {
-        indices[i] = -1;
+        freq[i] = 0;
     }
     loop(i,N) {
         cin >> nums[i];
-        indices[nums[i]+1000000] = i;
     }
 
-    // gen PF
-    loop(ind,N) {
-        int val = nums[ind];
-        int count = 0;
-        loop(loc,N) {
-            if (nums[loc]==val) {
-                ++count;
+    // gen #trips with ends
+    int comp;
+    loop(i,N) {
+        iloop(j,i+1,N) {
+            if (j>=i+2) {
+                comp = -1*(nums[i]+nums[j]);
+                if (comp>=-1*M && comp<=M) {
+                    DP[i][j] += freq[comp+M];
+                }
             }
-            PF[ind][loc] = count;
+            ++freq[nums[j]+M];
         }
+        iloop(j,i+1,N) {
+            --freq[nums[j]+M];
+        }
+
     }
 
     // failed gen PF
@@ -72,17 +77,9 @@ int main() {
         loop(st,N-si) {
             int en = si+st;
             if (si<=1) {
-                DP[st][en] = 0;
                 continue;
             }
-            int ans = DP[st][en-1] + DP[st+1][en] - DP[st+1][en-1];
-            // searching for val in the interval
-            int val = -1*(nums[st]+nums[en]);
-            if (indices[val+1000000]>=0) {
-                int ind = indices[val+1000000];
-                ans += PF[ind][en-1]-PF[ind][st];
-            }
-            DP[st][en] = ans;
+            DP[st][en] += DP[st][en-1] + DP[st+1][en] - DP[st+1][en-1];
         }
     }
 
