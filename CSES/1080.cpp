@@ -20,18 +20,48 @@ typedef vector<int>      vi;
 #define MP make_pair
 
 // DP[si][st]
-int DP[500][500];
-int binom[250][250];
+const ll L = 500;
+ll DP[L][L];
+ll binom[L/2+5][L/2];
 
-int mix(int s1, int s2) {
+ll mix(int s1, int s2) {
     // how to mix s1+1 steps and s2 steps? binom
+    return binom[s1+s2+1][min(s1+1,s2)];
+}
 
+ll myDiv(int dd, int dr) {
+    int e = MOD-2;
+    ll pow = dr;
+    ll ans = dd;
+    while (e) {
+        if (e%2) {
+            ans *= pow;
+            ans %= MOD;
+        }
+        e/=2;
+        pow *= pow;
+        pow %= MOD;
+    }
+    return ans;
 }
 
 int main() {
     // freopen("input","r",stdin);
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+
+    // binom[m][n] is mCn, m<=250, n<=m/2
+    loop(n,L/4+2) {
+        ll num = 1;
+        binom[n][n] = 1;
+        iloop(m,n+1,L/2+5) {
+            num *= m;
+            num %= MOD;
+            num = myDiv(num,m-n);
+            num %= MOD;
+            binom[m][n] = (ll)num;
+        }
+    }
 
     string s;
     cin >> s;
@@ -43,27 +73,32 @@ int main() {
     loop(si,n) {
         loop(st,n-si) {
             if (si%2==0) {
-                DP[si][st]==0;
+                DP[si][st]=0;
                 continue;
             }
             if (si==1) {
-                DP[si][st]==(int)(chars[st]==chars[st+1]);
+                DP[si][st]=(int)(chars[st]==chars[st+1]);
             }
-            int ans = 0;
+            ll ans = 0;
             for (int gap=0; gap<si; gap+=2) {
                 if (chars[st]==chars[st+gap+1]) {
-                    int poss1, poss2;
+                    ll poss1, poss2;
                     poss1 = poss2 = 1;
                     if (gap) {
-                        poss1 = DP[gap-1][st+gap-1];
+                        poss1 = DP[gap-1][st+1];
                     }
-                    if (si-gap-2) {
-                        poss1 = DP[si-gap-2][st+gap-1];
+                    if (si-gap-1) {
+                        poss2 = DP[si-gap-2][st+gap+2];
                     }
-                    ans += poss1 * poss2 * mix(gap/2,(si-gap-1)/2);
+                    ll newV = poss1 * poss2;
+                    newV %= MOD;
+                    newV *= mix(gap/2,(si-gap-1)/2);
+                    ans += newV;
+                    ans %= MOD;
                 }
             }
+            DP[si][st] = ans;
         }
     }
-
+    cout << DP[n-1][0];
 }
