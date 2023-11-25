@@ -262,18 +262,88 @@ void setIO(str s = "") {
 	if (sz(s)) setIn(s + ".in"), setOut(s + ".out");  // for USACO
 }
 
-int n, m, dist[2501], ans = MOD;
-vi adj[2501];
+const int L = 100000;
+int parents[L];
+int depths[L];
+int leafDist[L];
 
 int main() {
     // freopen("../input","r",stdin);
     // freopen("../myoutput","w",stdout);
-	setIO();
-	re(n, m);
-	F0R(i, m) {
+	setIO("atlarge");
+	// setIO();
+	int n,k;
+	re(n, k); --k;
+	vi adj[n];
+	F0R(i, n-1) {
 		int a, b;
 		re(a, b);
-		adj[a].pb(b), adj[b].pb(a);
+		adj[a-1].pb(b-1); adj[b-1].pb(a-1);
 	}
-	ps(3);
+	parents[k] = -1;
+
+	// find height from top
+	queue<int> BFSQ;
+	vi BFSA;
+	BFSQ.push(k);
+	BFSQ.push(-1);
+	int node;
+	int depth = 0;
+	while (BFSQ.size()) {
+		node = BFSQ.front();
+		BFSQ.pop();
+		BFSA.pb(node);
+		if (node < 0) {
+			if (BFSQ.size()) {
+				BFSQ.push(-1);
+				++depth;
+			}
+			continue;
+		}
+		depths[node] = depth;
+		trav(nb,adj[node]) {
+			if (nb != parents[node]) {
+				BFSQ.push(nb);
+				parents[nb] = node;
+			}
+		}
+	}
+	
+	// find dist from leaf
+	BFSQ = queue<int>();
+	bool visited[n];
+	F0R(i,n) {
+		visited[i] = false;
+		if (adj[i].size()==1 && i!=k) {
+			BFSQ.push(i);
+			visited[i] = true;
+		}
+	}
+	BFSQ.push(-1);
+	int dist = 0;
+	while (BFSQ.size()) {
+		int node = BFSQ.front();
+		BFSQ.pop();
+		if (node<0) {
+			if (BFSQ.size()) {
+				++dist;
+				BFSQ.push(-1);
+			}
+			continue;
+		}
+		leafDist[node] = dist;
+		trav(nb,adj[node]) {
+			if (!visited[nb]) {
+				visited[nb] = true;
+				BFSQ.push(nb);
+			}
+		}
+	}
+
+	int ans = 0;
+	F0R(node, n) {
+		if (node == k) continue;
+		if (depths[node]>=leafDist[node] && depths[parents[node]] < leafDist[parents[node]]) ++ans;
+	}
+	cout << ans;
 }
