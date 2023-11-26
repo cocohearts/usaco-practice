@@ -82,15 +82,13 @@ void setIO(str s = "") {
 	if (sz(s)) setIn(s + ".in"), setOut(s + ".out");
 }
 
-void solve() {
-
-}
+void solve() {}
 
 int main() {
 	#ifdef LOCAL // call with -DLOCAL
-		freopen("input.txt", "r", stdin);
-		freopen("output.txt", "w", stdout);
-		freopen("debug.txt", "w", stderr);
+		freopen("../input.txt", "r", stdin);
+		freopen("../myoutput.txt", "w", stdout);
+		freopen("../debug.txt", "w", stderr);
 		#define dbg(...)                                           \
 			cerr << "L" << __LINE__ << " [" << #__VA_ARGS__ << "]" \
 				<< ": ";                                           \
