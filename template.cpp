@@ -31,7 +31,7 @@ using vpd = vector<pd>;
 // const int dx[4] = {1, 0, -1, 0},
 //           dy[4] = {0, 1, 0, -1};  // for every grid problem!!
 
-#define sz(x) int(size(x))
+#define sz(x) int(x.size())
 #define bg(x) begin(x)
 #define all(x) bg(x), end(x)
 #define rall(x) x.rbegin(), x.rend()
