@@ -88,7 +88,67 @@ void setIO(str s = "") {
 	const int L = 100000;
 #endif
 
-void solve() {}
+int Bs[2*L], Es[2*L];
+pair<pi,int> pies[2*L];
+bool visited[2*L];
+int dists[2*L];
+
+void solve() {
+	int N,D;
+	cin >> N >> D;
+	F0R(i,2*N) {
+		cin >> pies[i].f.f >> pies[i].f.s;
+		Bs[i] = pies[i].f.f; Es[i] = pies[i].f.s;
+		pies[i].s = i;
+	}
+	auto revsort = [](pair<pi,int> p1, pair<pi,int> p2) {
+		return (mp(p1.f.s,p1.f.f) < mp(p2.f.s,p2.f.f));
+	};
+	sort(pies,pies+N,revsort);
+	sort(pies+N,pies+2*N);
+
+	queue<int> BFSQ;
+	F0R(i,2*N) {
+		if ((i<N && Es[i]==0) || (i>=N && Bs[i]==0)) {
+			BFSQ.push(i);
+			visited[i] = true;
+			dists[i] = 1;
+		}
+		else {
+			visited[i] = false;
+			dists[i] = -1;
+		}
+	}
+	while (BFSQ.size()) {
+		int ind = BFSQ.ft;
+		BFSQ.pop();
+		pair<pi,int> *start, *end;
+		if (ind < N) {
+			// after this Bessie gave, so rn Elsie is giving
+			start = lb(pies+N,pies+2*N,mp(mp(Bs[ind]-D,0),0));
+			end = ub(pies+N,pies+2*N,mp(mp(Bs[ind],INT_MAX),INT_MAX));
+		} else {
+			// after this Elsie gave, so rn Bessie is giving
+			int rating = Es[ind];
+			start = lb(pies,pies+N,mp(mp(0,rating-D),0),revsort);
+			end = ub(pies,pies+N,mp(mp(INT_MAX,rating),INT_MAX),revsort);
+		}
+		while (start != end) {
+			int newInd = (*start).s;
+			if (!visited[newInd]) {
+				visited[newInd] = true;
+				dists[newInd] = dists[ind]+1;
+				BFSQ.push(newInd);
+			}
+			++start;
+		}
+	}
+	int dist;
+	F0R(i,N) {
+		dist = dists[i];
+		cout << dist << endl;
+	}
+}
 
 int main() {
 	#ifdef LOCAL // call with -DLOCAL
@@ -100,8 +160,7 @@ int main() {
 				<< ": ";                                           \
 			dbgh(__VA_ARGS__)
 	#else
-	 	// TODO
-		setIO();
+		setIO("piepie");
 		#define dbg(...)
 	#endif
 

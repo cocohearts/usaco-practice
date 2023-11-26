@@ -28,6 +28,7 @@
                 "-fstack-protector",
                 "-D_GLIBCXX_ASSERTIONS",
                 "-DDEBUG",
+                "-DLOCAL",
                 "-ggdb3",
                 "${file}",
                 "-o",
