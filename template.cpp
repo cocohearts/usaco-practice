@@ -57,9 +57,9 @@ using vpd = vector<pd>;
 
 template <class T> using pqg = priority_queue<T, vector<T>, greater<T>>;
 
-constexpr int pct(int x) { return __builtin_popcount(x); }
+constexpr int pct(int x) { return (int)__builtin_popcount(x); }
 constexpr int bits(int x) {
-	return x == 0 ? 0 : 31 - __builtin_clz(x);
+	return x == 0 ? 0 : 31 - (int)__builtin_clz(x);
 }
  
 template <typename T, typename... U>
@@ -84,8 +84,13 @@ void setIO(str s = "") {
 
 #ifdef LOCAL
 	const int L = 100;
+	#define dbg(...)                                           \
+		cerr << "L" << __LINE__ << " [" << #__VA_ARGS__ << "]" \
+			<< ": ";                                           \
+		dbgh(__VA_ARGS__)
 #else
 	const int L = 100000;
+	#define dbg(...)
 #endif
 
 void solve() {}
@@ -95,14 +100,8 @@ int main() {
 		freopen("../input.txt", "r", stdin);
 		freopen("../myoutput.txt", "w", stdout);
 		freopen("../debug.txt", "w", stderr);
-		#define dbg(...)                                           \
-			cerr << "L" << __LINE__ << " [" << #__VA_ARGS__ << "]" \
-				<< ": ";                                           \
-			dbgh(__VA_ARGS__)
 	#else
-	 	// TODO
 		setIO();
-		#define dbg(...)
 	#endif
 
 	solve();
