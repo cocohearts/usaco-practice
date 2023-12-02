@@ -26,7 +26,7 @@ using vpd = vector<pd>;
 
 // const int MOD = 1e9 + 7;
 // const int MX = 2e5 + 5;
-// const int INF = 1e9;  // not too close to LLONG_MAX
+const int INF = 1e9;  // not too close to LLONG_MAX
 // const ll INF = 1e18;  // not too close to LLONG_MAX
 // const ld PI = acos((ld)-1);
 // const int dx[4] = {1, 0, -1, 0},
@@ -84,17 +84,65 @@ void setIO(str s = "") {
 }
 
 #ifdef LOCAL
-	const int L = 100;
+	const int L = 10;
 	#define dbg(...)                                           \
 		cerr << "L" << __LINE__ << " [" << #__VA_ARGS__ << "]" \
 			<< ": ";                                           \
 		dbgh(__VA_ARGS__)
 #else
-	const int L = 100000;
+	const int L = 1000;
 	#define dbg(...)
 #endif
 
-void solve() {}
+vpi adj[L];
+int flows[L][L];
+int flowArr[L];
+int dists[L];
+bool solved[L];
+
+void solve() {
+	int N,M;
+	cin >> N >> M;
+	int a,b,c,fl;
+	F0R(_,M) {
+		cin >> a >> b >> c >> fl;
+		--a; --b;
+		adj[a].pb(mp(c,b));
+		adj[b].pb(mp(c,a));
+		flows[a][b] = flows[b][a] = fl;
+		flowArr[_] = fl;
+	}
+	db ans = 0.0;
+	F0R(ind,M) {
+		int lst = flowArr[ind];
+		priority_queue<pi,vpi,greater<pi>> DijQ;
+		DijQ.push(mp(0,0));
+		F0R(i,N) {
+			dists[i] = INF;
+			solved[i] = false;
+		}
+		dists[0] = 0;
+		while(DijQ.size()) {
+			pi nN = DijQ.top(); DijQ.pop();
+			int dist = nN.f; int node = nN.s;
+			if (solved[node]) continue;
+			solved[node] = true;
+			trav(nb,adj[node]) {
+				if (flows[node][nb.s] >= lst && !solved[nb.s]) {
+					int nbDist = dist + nb.f;
+					if (nbDist < dists[nb.s]) {
+						dists[nb.s] = nbDist;
+						DijQ.push(mp(nbDist,nb.s));
+					}
+				}
+			}
+		}
+		if (dists[N-1]<INF) {
+			ans = max(ans,(db)lst/(db)dists[N-1]);
+		}
+	}
+	cout << (int)(1e6 * ans);
+}
 
 int main() {
 	#ifdef LOCAL // call with -DLOCAL
@@ -102,7 +150,7 @@ int main() {
 		freopen("../myoutput.txt", "w", stdout);
 		freopen("../debug.txt", "w", stderr);
 	#else
-		setIO();
+		setIO("pump");
 	#endif
 
 	solve();
