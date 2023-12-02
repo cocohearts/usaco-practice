@@ -26,7 +26,7 @@ using vpd = vector<pd>;
 
 // const int MOD = 1e9 + 7;
 // const int MX = 2e5 + 5;
-// const int INF = 1e9;
+const int INF = 1e9;
 // const ll INF = 1e18;  // not too close to LLONG_MAX
 // const ld PI = acos((ld)-1);
 // const int dx[4] = {1, 0, -1, 0},
@@ -90,11 +90,82 @@ void setIO(str s = "") {
 			<< ": ";                                           \
 		dbgh(__VA_ARGS__)
 #else
-	const int L = 100000;
+	const int L = 10000;
 	#define dbg(...)
 #endif
 
-void solve() {}
+int cowCt[L];
+vpi adj[L];
+int pred[L];
+bool solved[L];
+int dists[L];
+
+int childCt[L];
+vi succs[L];
+
+int recurse(int n) {
+	childCt[n] = cowCt[n];
+	trav(child,succs[n]) {
+		childCt[n] += recurse(child);
+	}
+	return childCt[n];
+}
+
+void solve() {
+	int N,M,T;
+	cin >> N >> M >> T;
+	F0R(i,N) {
+		cin >> cowCt[i];
+	}
+	int a,b,t;
+	F0R(_,M) {
+		cin >> a >> b >> t;
+		--a; --b;
+		adj[a].pb(mp(t,b));
+		adj[b].pb(mp(t,a));
+	}
+	// Dijkstra, but also track which nodes each of the minimal paths came from in pred
+	priority_queue<pi,vpi,greater<pi>> DijQ;
+	DijQ.push(mp(0,0));
+	F0R(ind,N) {
+		solved[ind] = false;
+		dists[ind] = INF;
+		pred[ind] = -1;
+	}
+	dists[0] = 0;
+	while(DijQ.size()) {
+		pi nN = DijQ.top(); DijQ.pop();
+		int dist = nN.f; int nd = nN.s;
+		if (solved[nd]) continue;
+		solved[nd] = true;
+		trav(nb,adj[nd]) {
+			int nbN = nb.s;
+			if (!solved[nbN]) {
+				int nbDist = dist+nb.f;
+				if (nbDist<dists[nbN]) {
+					dists[nbN] = nbDist;
+					DijQ.push(mp(nbDist,nbN));
+					pred[nbN] = nd;
+				} else if (nbDist == dists[nbN]) {
+					pred[nbN] = min(pred[nbN],nd);
+				}
+			}
+		}
+	}
+	F0R(ind,N) {
+		if(pred[ind]>=0) {
+			succs[pred[ind]].pb(ind);
+		}
+	}
+	recurse(0);
+
+	ll ans = 0;
+	F0R(nd,N) {
+		ll newAns = (ll)(dists[nd]-T) * ((ll)childCt[nd]);
+		ans = max(newAns,ans);
+	}
+	cout << ans;
+}
 
 int main() {
 	#ifdef LOCAL // call with -DLOCAL
@@ -102,7 +173,7 @@ int main() {
 		freopen("../myoutput.txt", "w", stdout);
 		freopen("../debug.txt", "w", stderr);
 	#else
-		setIO();
+		setIO("shortcut");
 	#endif
 
 	solve();
