@@ -97,7 +97,11 @@ void setIO(str s = "") {
 struct DSU {
 	vi g;
 	DSU(int N) {g = vi(N,-1);}
-	int get(int x) {return g[x]<0 ? x : get(g[x]);}
+	int get(int x) {
+		if (g[x]<0) return x;
+		g[x] = get(g[x]);
+		return g[x];
+	}
 	int size(int x) {return -1*g[get(x)];}
 	bool join(int x, int y) {
 		int a=get(x), b=get(y);
@@ -124,20 +128,22 @@ void solve() {
 	R0F(ind,m) {
 		Barr[ind+1] = Barr[ind+1]-Barr[ind];
 	}
-	priority_queue<pair<int,pi>,vector<pair<int,pi>>,greater<pair<int,pi>>> pairings;
+	// priority_queue<pair<int,pi>,vector<pair<int,pi>>,greater<pair<int,pi>>> pairings;
+	vector<pair<int,pi>> pairings;
 	F0R(x,n+1) F0R(y,m+1) {
 		int ind = (n+1)*y+x;
 		if (x!=0) {
-			pairings.push(mp(Barr[y],mp(ind-1,ind)));
+			pairings.pb(mp(Barr[y],mp(ind-1,ind)));
 		}
 		if (y!=0) {
-			pairings.push(mp(Aarr[x],mp(ind-n-1,ind)));
+			pairings.pb(mp(Aarr[x],mp(ind-n-1,ind)));
 		}
 	}
+	sort(all(pairings));
 	DSU myDSU((m+1)*(n+1));
 	ll score=0;
-	while (myDSU.size(0)!=(m+1)*(n+1)) {
-		auto nn = pairings.top(); pairings.pop();
+	trav(nn,pairings) {
+		if (myDSU.size(0)==(m+1)*(n+1)) break;
 		if (myDSU.join(nn.s.f,nn.s.s)) {
 			score += nn.f;
 		}
