@@ -58,6 +58,12 @@ using vpd = vector<pd>;
 
 template <class T> using pqg = priority_queue<T, vector<T>, greater<T>>;
 
+#include <ext/pb_ds/assoc_container.hpp>
+using namespace __gnu_pbds;
+template <class T>
+using Tree =
+    tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
 constexpr int pct(int x) { return (int)__builtin_popcount(x); }
 constexpr int bits(int x) {
 	return x == 0 ? 0 : 31 - (int)__builtin_clz(x);
