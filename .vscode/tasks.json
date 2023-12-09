@@ -3,7 +3,7 @@
         {
             "type": "cppbuild",
             "label": "C/C++: g++ build active file",
-            "command": "/usr/bin/g++",
+            "command": "/opt/homebrew/bin/g++-13",
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
