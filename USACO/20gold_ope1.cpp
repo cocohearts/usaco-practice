@@ -56,13 +56,13 @@ using vpd = vector<pd>;
 #define R0F(i, a) ROF(i, 0, a)
 #define trav(a, x) for (auto &a : x)
 
-// template <class T> using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <class T> using pqg = priority_queue<T, vector<T>, greater<T>>;
 
-// #include <ext/pb_ds/assoc_container.hpp>
-// using namespace __gnu_pbds;
-// template <class T>
-// using Tree =
-//     tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+#include <ext/pb_ds/assoc_container.hpp>
+using namespace __gnu_pbds;
+template <class T>
+using Tree =
+    tree<T, null_type, greater_equal<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
 constexpr int pct(int x) { return (int)__builtin_popcount(x); }
 constexpr int bits(int x) {
@@ -90,7 +90,7 @@ void setIO(str s = "") {
 }
 
 #ifdef LOCAL
-	const int L = 100;
+	const int L = 100000;
 	#define dbg(...)                                           \
 		cerr << "L" << __LINE__ << " [" << #__VA_ARGS__ << "]" \
 			<< ": ";                                           \
@@ -100,7 +100,28 @@ void setIO(str s = "") {
 	#define dbg(...)
 #endif
 
-void solve() {}
+int nums[L];
+// cutting to i+1 instead of i increases by increase[i]
+ll increase[L+2];
+Tree<ll> ordered_set;
+
+void solve() {
+	int N; cin >> N;
+	F0R(i,N) {
+		cin >> nums[i];
+		increase[i] = 0;
+	}
+
+	F0R(ind,N) {
+		ordered_set.insert(nums[ind]);
+		increase[nums[ind]] += ordered_set.order_of_key(nums[ind]);
+	}
+	ll ret = 0;
+	F0R(ind,N) {
+		cout << ret << endl;
+		ret += (ll)increase[ind];
+	}
+}
 
 int main() {
 	#ifdef LOCAL // call with -DLOCAL
@@ -108,7 +129,7 @@ int main() {
 		freopen("../myoutput.txt", "w", stdout);
 		freopen("../debug.txt", "w", stderr);
 	#else
-		setIO();
+		setIO("haircut");
 	#endif
 
 	solve();
