@@ -4,7 +4,6 @@
 
 input
 myoutput
-*.txt
 *.dSYM/
 .DS_Store
 *.in
