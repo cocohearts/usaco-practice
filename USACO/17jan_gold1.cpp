@@ -58,11 +58,11 @@ using vpd = vector<pd>;
 
 // template <class T> using pqg = priority_queue<T, vector<T>, greater<T>>;
 
-// #include <ext/pb_ds/assoc_container.hpp>
-// using namespace __gnu_pbds;
-// template <class T>
-// using Tree =
-//     tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+#include <ext/pb_ds/assoc_container.hpp>
+using namespace __gnu_pbds;
+template <class T>
+using Tree =
+    tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
 constexpr int pct(int x) { return (int)__builtin_popcount(x); }
 constexpr int bits(int x) {
@@ -107,9 +107,21 @@ int Rs[L];
 void solve() {
 	int N; cin >> N;
 	F0R(i,N) cin >> hts[i];
-
-
-
+	Tree<int> ordered_set;
+	F0R(i,N) {
+		ordered_set.insert(hts[i]);
+		Ls[i] = i - ordered_set.order_of_key(hts[i]);
+	}
+	ordered_set.clear();
+	R0F(i,N) {
+		ordered_set.insert(hts[i]);
+		Rs[i] = N-1-i - ordered_set.order_of_key(hts[i]);
+	}
+	int ret = 0;
+	F0R(i,N) {
+		if (Ls[i]>2*Rs[i] || Rs[i]>2*Ls[i]) ++ret;
+	}
+	cout << ret;
 }
 
 int main() {
@@ -118,7 +130,7 @@ int main() {
 		freopen("../myoutput.txt", "w", stdout);
 		freopen("../debug.txt", "w", stderr);
 	#else
-		setIO();
+		setIO("bphoto");
 	#endif
 
 	solve();
