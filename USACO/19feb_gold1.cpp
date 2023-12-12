@@ -26,7 +26,7 @@ using vpd = vector<pd>;
 
 // const int MOD = 1e9 + 7;
 // const int MX = 2e5 + 5;
-// const int INF = 1e9;
+const int INF = 1e9;
 // const ll INF = 1e18;  // not too close to LLONG_MAX
 // const ld PI = acos((ld)-1);
 // const int dx[4] = {1, 0, -1, 0},
@@ -56,7 +56,13 @@ using vpd = vector<pd>;
 #define R0F(i, a) ROF(i, 0, a)
 #define trav(a, x) for (auto &a : x)
 
-template <class T> using pqg = priority_queue<T, vector<T>, greater<T>>;
+// template <class T> using pqg = priority_queue<T, vector<T>, greater<T>>;
+
+// #include <ext/pb_ds/assoc_container.hpp>
+// using namespace __gnu_pbds;
+// template <class T>
+// using Tree =
+//     tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
 constexpr int pct(int x) { return (int)__builtin_popcount(x); }
 constexpr int bits(int x) {
@@ -84,7 +90,7 @@ void setIO(str s = "") {
 }
 
 #ifdef LOCAL
-	const int L = 100;
+	const int L = 10000;
 	#define dbg(...)                                           \
 		cerr << "L" << __LINE__ << " [" << #__VA_ARGS__ << "]" \
 			<< ": ";                                           \
@@ -94,21 +100,76 @@ void setIO(str s = "") {
 	#define dbg(...)
 #endif
 
-int vals[L];
-vi adjList[L];
-
-int ret;
-
-bool solve(int i,int j,int pa) {
-	if (i==j) {
-		return True;
-	}
-	trav(child,adjList[i]) {
-		if (child!=pa) {
-			ret ^= vals[child];
-			if (!solve(child,j,i))
+struct XORSegmentTree {
+	vi sgtr; int len;
+	XORSegmentTree(int N) {len=N; sgtr=vi(2*N,0);}
+	void update(int ind1, int ind2, int val) {
+		for(ind1+=len,ind2+=len; ind2>ind1; ind1>>=1,ind2>>=1) {
+			if (ind1%2) sgtr[ind1++]^=val;
+			if (ind2%2) sgtr[--ind2]^=val;
 		}
 	}
+	int get(int ind) {
+		int ret = 0;
+		for(ind+=len; ind>0; ind>>=1) {
+			ret^=sgtr[ind];
+		}
+		return ret;
+	}
+};
+
+struct MinSegmentTree {
+	vi sgtr; int len; vi inds;
+	MinSegmentTree(int N) {len=N; sgtr=vi(2*N,INF); inds=vi(2*N);}
+	void set(int ind, int val) {
+		int start = ind;
+		for(ind+=len; ind>0; ind>>=1) {
+			sgtr[ind] = min(sgtr[ind],val);
+			if (sgtr[ind]==val) inds[ind]=start;
+		}
+	}
+	int get_ind_min(int ind1, int ind2) {
+		if (ind1>ind2) swap(ind1,ind2);
+		int ret = INF;
+		int ind = 0;
+		for(ind1+=len,ind2+=len; ind2>ind1; ind1>>=1,ind2>>=1) {
+			if (ind1%2) {
+				ret = min(ret,sgtr[ind1++]);
+				if (ret==sgtr[ind1-1]) {
+					ind = inds[ind1-1];
+				}
+			}
+			if (ind2%2) {
+				ret = min(ret,sgtr[--ind2]);
+				if (ret==sgtr[ind2]) {
+					ind = inds[ind2];
+				}
+			}
+		}
+		return ind;
+	}
+};
+
+
+int vals[L];
+vi adjList[L];
+int first[L];
+int last[L];
+vi tour;
+int heights[L];
+int depth = 0;
+
+void recurse(int nd, int pa) {
+	first[nd] = tour.size();
+	tour.pb(nd);
+	heights[nd] = depth;
+	++depth;
+	trav(child,adjList[nd]) {
+		if (child!=pa) {recurse(child,nd); }
+		tour.pb(nd);
+	}
+	last[nd] = tour.size()-1;
+	--depth;
 }
 
 void solve() {
@@ -120,7 +181,33 @@ void solve() {
 		--a; --b;
 		adjList[a].pb(b); adjList[b].pb(a);
 	}
+	recurse(0,-1);
 
+	XORSegmentTree xors(3*N-2);
+	F0R(i,N) {
+		xors.update(first[i],last[i],vals[i]);
+	}
+
+	MinSegmentTree tour_heights(3*N-2);
+	F0R(i,3*N-2) {
+		tour_heights.set(i,heights[tour[i]]);
+	}
+
+	int sig;
+	F0R(_,Q) {
+		cin >> sig >> a >> b;
+		if (sig==1) {
+			--a;
+			xors.update(first[a],last[a],vals[a]^b);
+			vals[a] = b;
+		}
+		if (sig==2) {
+			--a; --b;
+			int ans = xors.get(first[a]) ^ xors.get(first[b]);
+			ans ^= vals[tour[tour_heights.get_ind_min(first[a],first[b])]];
+			cout << ans << endl;
+		}
+	}
 }
 
 int main() {
@@ -129,7 +216,7 @@ int main() {
 		freopen("../myoutput.txt", "w", stdout);
 		freopen("../debug.txt", "w", stderr);
 	#else
-		setIO();
+		setIO("cowland");
 	#endif
 
 	solve();
