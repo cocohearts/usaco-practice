@@ -90,13 +90,13 @@ void setIO(str s = "") {
 }
 
 #ifdef LOCAL
-	const int L = 100;
+	const int L = 10;
 	#define dbg(...)                                           \
 		cerr << "L" << __LINE__ << " [" << #__VA_ARGS__ << "]" \
 			<< ": ";                                           \
 		dbgh(__VA_ARGS__)
 #else
-	const int L = 100000;
+	const int L = 100005;
 	#define dbg(...)
 #endif
 
