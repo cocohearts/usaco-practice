@@ -100,8 +100,39 @@ void setIO(str s = "") {
 	#define dbg(...)
 #endif
 
+int lefts[L];
+int rights[L];
+vi adj[L];
+
+ll DP[L][2];
+
+void recurse(int v,int p) {
+	ll L_max=0, R_max=0;
+	trav(child,adj[v]) if(child!=p) {
+		recurse(child,v);
+		L_max += max(abs(lefts[v]-lefts[child])+DP[child][0],abs(lefts[v]-rights[child])+DP[child][1]);
+		R_max += max(abs(rights[v]-lefts[child])+DP[child][0],abs(rights[v]-rights[child])+DP[child][1]);
+	}
+	DP[v][0]=L_max; DP[v][1]=R_max;
+}
+
 void solve() {
-	
+	int t; cin >> t;
+	F0R(tC,t) {
+		int n; cin >> n;
+		FOR(nd,1,n+1) adj[nd].clear();
+		FOR(nd,1,n+1) {
+			cin >> lefts[nd] >> rights[nd];
+		}
+		int a,b;
+		F0R(_,n-1) {
+			cin >> a >> b;
+			adj[a].pb(b); adj[b].pb(a);
+		}
+		recurse(1,-1);
+		cout << max(DP[1][0],DP[1][1]) << endl;
+	}
+
 }
 
 int main() {
