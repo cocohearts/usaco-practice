@@ -118,9 +118,6 @@ bool recurse(int v,int p,int k) {
 		}
 	}
 	sort(all(subtrees));
-	if (v==2&&k==4) {
-		int flag=1;
-	}
 	int l=0, r=subtrees.size()-1;
 	int skipped=0;
 	int val;
