@@ -1,0 +1,188 @@
+#include "bits/stdc++.h"
+using namespace std;
+
+using ll = long long;
+using ld = long double;
+using db = double;
+using str = string;
+
+using pi = pair<int, int>;
+using pl = pair<ll, ll>;
+using pd = pair<db, db>;
+
+using vi = vector<int>;
+using vvi = vector<vi>;
+using vb = vector<bool>;
+using vl = vector<ll>;
+using vd = vector<db>;
+using vs = vector<str>;
+using vpi = vector<pi>;
+using vpl = vector<pl>;
+using vpd = vector<pd>;
+
+#define mp make_pair
+#define f first
+#define s second
+
+// const int MOD = 1e9 + 7;
+// const int MX = 2e5 + 5;
+// const int INF = 1e9;
+// const ll INF = 1e18;  // not too close to LLONG_MAX
+// const ld PI = acos((ld)-1);
+// const int dx[4] = {1, 0, -1, 0},
+//           dy[4] = {0, 1, 0, -1};  // for every grid problem!!
+
+#define sz(x) int(x.size())
+#define bg(x) begin(x)
+#define all(x) bg(x), end(x)
+#define rall(x) x.rbegin(), x.rend()
+#define sor(x) sort(all(x))
+#define rsz resize
+#define ins insert
+#define ft front()
+#define bk back()
+#define pb push_back
+#define eb emplace_back
+#define pf push_front
+
+#define lb lower_bound
+#define ub upper_bound
+
+#define endl "\n"
+
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define trav(a, x) for (auto &a : x)
+
+// template <class T> using pqg = priority_queue<T, vector<T>, greater<T>>;
+
+// #include <ext/pb_ds/assoc_container.hpp>
+// using namespace __gnu_pbds;
+// template <class T>
+// using Tree =
+//     tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+constexpr int pct(int x) { return (int)__builtin_popcount(x); }
+constexpr int bits(int x) {
+	return x == 0 ? 0 : 31 - (int)__builtin_clz(x);
+}
+ 
+template <typename T, typename... U>
+void dbgh(const T& t, const U&... u) {
+    cerr << t;
+    ((cerr << " | " << u), ...);
+    cerr << endl;
+}
+ 
+void setPrec() { cout << fixed << setprecision(15); }
+void unsyncIO() { cin.tie(0)->sync_with_stdio(0); }
+
+void setIn(str s) { freopen(s.c_str(), "r", stdin); }
+void setOut(str s) { freopen(s.c_str(), "w", stdout); }
+void setIO(str s = "") {
+	unsyncIO();
+	setPrec();
+	cin.exceptions(cin.failbit);
+
+	if (sz(s)) setIn(s + ".in"), setOut(s + ".out");
+}
+
+#ifdef LOCAL
+	const int L = 15;
+	#define dbg(...)                                           \
+		cerr << "L" << __LINE__ << " [" << #__VA_ARGS__ << "]" \
+			<< ": ";                                           \
+		dbgh(__VA_ARGS__)
+#else
+	const int L = 100005;
+	#define dbg(...)
+#endif
+
+vi adj[L];
+
+int DP[L];
+
+bool check(vi arr, int ind, int k) {
+	// takes sorted arr, we skip ind, can we pair into summing at least k?
+	int SZ = arr.size()-1;
+	if (ind==-1) ++SZ;
+	if (SZ%2) {
+		R0F(k_ind,arr.size()) {
+			if (k_ind!=ind) {
+				if (arr[k_ind]==k) arr.pop_back();
+				else return false;
+				break;
+			}
+		}
+	}
+
+	int l=0, r=arr.size()-1;
+	while(r>l) {
+		if (l==ind) {++l; continue;}
+		if (r==ind) {--r; continue;}
+		int val = arr[l]+arr[r];
+		if (val<k) return false;
+		++l; --r;
+	}
+	return true;
+}
+
+bool recurse(int v,int p,int k) {
+	vi paths;
+	trav(child,adj[v]) if(child!=p) {
+		if (!recurse(child,v,k)) return false;
+		paths.pb(min(k,DP[child]+1));
+	}
+	sort(all(paths));
+	if (paths.size()) {
+		if (v==1) {
+			return check(paths,-1,k);
+		}
+		int l=-1,r=paths.size()-1,mid;
+		while (r>l) {
+			mid = ((r+l)/2)+1;
+			if (!r) mid=0;
+			if (check(paths,mid,k)) {
+				l=mid;
+			} else r=mid-1;
+		}
+		DP[v]=paths[l];
+		if (!check(paths,l,k)) return false;
+		return true;
+	}
+	DP[v]=0;
+	return true;
+}
+
+void solve() {
+	int N; cin >> N;
+	int a,b;
+	F0R(_,N-1) {
+		cin >> a >> b;
+		adj[a].pb(b); adj[b].pb(a);
+	}
+	int bot=1, top=N-1, mid;
+	while (top>bot) {
+		mid = (bot+top)/2+1;
+		if (recurse(1,-1,mid)) {
+			bot=mid;
+		} else {
+			top=mid-1;
+		}
+	}
+	cout << bot;
+}
+
+int main() {
+	#ifdef LOCAL // call with -DLOCAL
+		freopen("../input.txt", "r", stdin);
+		freopen("../myoutput.txt", "w", stdout);
+		freopen("../debug.txt", "w", stderr);
+	#else
+		setIO("deleg");
+	#endif
+
+	solve();
+}
