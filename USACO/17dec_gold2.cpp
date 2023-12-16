@@ -56,7 +56,13 @@ const int MOD = 1e9 + 7;
 #define R0F(i, a) ROF(i, 0, a)
 #define trav(a, x) for (auto &a : x)
 
-template <class T> using pqg = priority_queue<T, vector<T>, greater<T>>;
+// template <class T> using pqg = priority_queue<T, vector<T>, greater<T>>;
+
+// #include <ext/pb_ds/assoc_container.hpp>
+// using namespace __gnu_pbds;
+// template <class T>
+// using Tree =
+//     tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
 constexpr int pct(int x) { return (int)__builtin_popcount(x); }
 constexpr int bits(int x) {
@@ -94,81 +100,62 @@ void setIO(str s = "") {
 	#define dbg(...)
 #endif
 
-const int MX=2e5+5;
-int T[MX];
+vi adj[L];
+int colors[L];
+int DP[L][3];
+int parents[L];
 
-template <int SZ> struct LCA {
-	static const int BITS = 32 - __builtin_clz(SZ);
-	int N, R = 1, cnt = 0, label[SZ];
-	vi adj[SZ], cur[SZ];
-	vpi CUR[SZ];
-	int par[BITS][SZ], depth[SZ];
-	// INITIALIZE
-	void addEdge(int u, int v) { adj[u].pb(v), adj[v].pb(u); }
-	void dfs(int u, int prev) {
-		label[u] = cnt++;
-		cur[T[u]].pb(u);
-		CUR[T[u]].pb({label[u], u});
-		par[0][u] = prev;
-		depth[u] = depth[prev] + 1;
-		trav(v, adj[u]) if (v != prev) dfs(v, u);
-		cur[T[u]].pop_back();
-		CUR[T[u]].pb({cnt, sz(cur[T[u]]) ? cur[T[u]].back() : 0});
-	}
-	void init(int _N) {
-		N = _N;
-		dfs(R, 0);
-		FOR(k, 1, BITS) FOR(i, 1, N + 1) par[k][i] = par[k - 1][par[k - 1][i]];
-	}
-	// QUERY
-	int getPar(int a, int b) {
-		R0F(k, BITS) if (b & (1 << k)) a = par[k][a];
-		return a;
-	}
-	int lca(int u, int v) {
-		if (depth[u] < depth[v]) swap(u, v);
-		u = getPar(u, depth[u] - depth[v]);
-		R0F(k, BITS) if (par[k][u] != par[k][v]) u = par[k][u], v = par[k][v];
-		return u == v ? u : par[0][u];
-	}
-	int dist(int u, int v) {
-		return depth[u] + depth[v] - 2 * depth[lca(u, v)];
-	}
-	int last(int a, int c) {
-		auto it = ub(all(CUR[c]), mp(label[a], MOD));
-		if (it == begin(CUR[c])) return 0;
-		return prev(it)->s;
-	}
-};
-
-LCA<MX> myLCA;
-int N, M, co;
+vi BFSArr;
+queue<int> BFS;
+vb visited(L,false);
 
 void solve() {
-	cin >> N >> M;
-	FOR(i,1,N+1) cin >> T[i];
-	F0R(i, N - 1) {
-		int X, Y;
-		cin >> X, Y;
-		myLCA.addEdge(X, Y);
+	int N,K; cin >> N >> K;
+	int a,b;
+	F0R(_,N-1) {
+		cin >> a >> b;
+		--a; --b;
+		adj[a].pb(b); adj[b].pb(a);
 	}
-	myLCA.init(N);
-	F0R(i, M) {
-		int A, B, C;
-		cin >> A >> B >> C;
-		int z = myLCA.lca(A, B);
-		int a = myLCA.last(A, C);
-		if (a && myLCA.depth[a] >= myLCA.depth[z]) {
-			cout << "1";
-			continue;
-		}
-		a = myLCA.last(B, C);
-		if (a && myLCA.depth[a] >= myLCA.depth[z]) {
-			cout << "1";
-			continue;
-		}
-		cout << "0";
+	F0R(i,N) colors[i]=-1;
+	F0R(_,K) {
+		cin >> b; --b; 
+		cin >> colors[b]; --colors[b];
 	}
+
+	BFS.push(0);
+	parents[0]=-1;
+	while(BFS.size()) {
+		int nd = BFS.front(); BFS.pop();
+		BFSArr.pb(nd);
+		visited[nd] = true;
+		trav(child,adj[nd]) {
+			if (!visited[child]) {BFS.push(child); parents[child]=nd;}
+		}
+	}
+	reverse(all(BFSArr));
+
+	F0R(ind,N) {
+		int nd = BFSArr[ind];
+		F0R(color,3) {
+			ll ans = 1;
+			if (colors[nd]>=0 && colors[nd]!=color) {
+				DP[nd][color]=0;
+				continue;
+			}
+			trav(child,adj[nd]) if(child!=parents[nd]) {
+				ll mult = 0;
+				F0R(childC,3) if(childC!=color) {mult+=DP[child][childC];}
+				mult %= MOD;
+				ans *= mult;
+				ans %= MOD;
+			}
+			DP[nd][color] = ans;
+		}
+	}
+	int ans = 0;
+	F0R(color,3) ans += DP[0][color];
+	cout << ans % MOD;
 }
 
 int main() {
@@ -177,7 +164,7 @@ int main() {
 		freopen("../myoutput.txt", "w", stdout);
 		freopen("../debug.txt", "w", stderr);
 	#else
-		setIO();
+		setIO("barnpainting");
 	#endif
 
 	solve();
