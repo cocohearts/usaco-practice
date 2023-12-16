@@ -8,3 +8,4 @@ myoutput
 .DS_Store
 *.in
 *.out
+*/basher.cpp
